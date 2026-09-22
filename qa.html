@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>VER-DÉ QA Test Suite</title>
+  <style>
+    body {
+      margin: 0;
+      background: #080a08;
+      color: #e9e7de;
+      font-family: monospace;
+      padding: 20px;
+    }
+    #results {
+      padding: 16px;
+      border: 1px solid #4e8c63;
+      background: #0f1310;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .pass { color: #6fb683; font-weight: bold; }
+    .fail { color: #e5484d; font-weight: bold; }
+    iframe {
+      width: 100%;
+      height: 800px;
+      border: 1px solid #3a423c;
+    }
+  </style>
+</head>
+<body>
+  <h1>VER-DÉ 2.0 Player & Access Automated Test Suite</h1>
+  <div id="results">Running tests...</div>
+  <iframe id="testFrame" src="/index.html"></iframe>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewMode = urlParams.get('view'); // 'bagsak' or 'founding' or null
+
+    const frame = document.getElementById('testFrame');
+    const results = document.getElementById('results');
+
+    function log(msg, isPass) {
+      const div = document.createElement('div');
+      div.className = isPass ? 'pass' : 'fail';
+      div.textContent = `${isPass ? '✓ PASS' : '✗ FAIL'}: ${msg}`;
+      results.appendChild(div);
+      console.log(div.textContent);
+    }
+
+    frame.onload = () => {
+      try {
+        const win = frame.contentWindow;
+        const doc = frame.contentDocument;
+
+        results.innerHTML = '';
+
+        // Test 1: Check catalog is loaded
+        const catalog = win.eval('catalog');
+        const bagsak = catalog.find(f => f.id === 'bagsak');
+        const foundingFilm = catalog.find(f => f.access === 'founding');
+        log('Catalog loaded and contains BAGSAK and Founding Film', Boolean(bagsak && foundingFilm));
+
+        // Test 2: Verify BAGSAK is free
+        log('BAGSAK has access: free', bagsak.access === 'free');
+
+        // Test 3: Open BAGSAK
+        win.eval('openFilmPlayer(catalog.find(f => f.id === "bagsak"))');
+        const modal = doc.querySelector('#watchDialog');
+        const title = doc.querySelector('#dialogTitle');
+        const text = doc.querySelector('#dialogText');
+        const player = doc.querySelector('#dialogPlayer');
+        const action = doc.querySelector('#dialogAction');
+        const youtubeFallback = doc.querySelector('#dialogYouTubeFallback');
+
+        log('Modal is open for BAGSAK', modal.hasAttribute('open'));
+        log('Modal title is BAGSAK', title.textContent === 'BAGSAK');
+        log('Modal text says "Free to watch on VER-DÉ."', text.textContent === 'Free to watch on VER-DÉ.');
+        log('Player visible (hidden=false)', player.hidden === false && win.getComputedStyle(player).display !== 'none');
+        log('Player src contains youtube-nocookie.com/embed/' + bagsak.videoId, player.src.includes('https://www.youtube-nocookie.com/embed/' + bagsak.videoId));
+        log('Player has strict-origin-when-cross-origin referrerPolicy', player.referrerPolicy === 'strict-origin-when-cross-origin' || player.getAttribute('referrerpolicy') === 'strict-origin-when-cross-origin');
+        log('GET FOUNDING ACCESS is NOT visible for BAGSAK', action.hidden === true && win.getComputedStyle(action).display === 'none');
+        log('WATCH ON YOUTUBE button does NOT exist in DOM', youtubeFallback === null);
+
+        // Test 4: Companion on BAGSAK
+        const companionLauncher = doc.querySelector('#companionLauncher');
+        companionLauncher.click();
+        const companionBody = doc.querySelector('#companionBody');
+        log('Film Companion expands when clicked', win.getComputedStyle(companionBody).display !== 'none');
+        const suggestions = doc.querySelectorAll('#companionSuggestions button');
+        log('Film Companion has suggested questions', suggestions.length > 0);
+
+        // Test 5: Founding Access Film
+        win.eval('openFilmPlayer(catalog.find(f => f.access === "founding"))');
+        log('Founding film modal title is ' + foundingFilm.title, title.textContent === foundingFilm.title);
+        log('Founding film text explains Founding Access', text.textContent.includes('Founding Access'));
+        log('Player is hidden for Founding Film (hidden=true, display=none)', player.hidden === true && win.getComputedStyle(player).display === 'none');
+        log('Player src is empty for Founding Film before access', player.src === '' || player.src.endsWith('/index.html') || player.src.endsWith('/qa.html'));
+        log('GET FOUNDING ACCESS is visible for Founding Film', action.hidden === false && win.getComputedStyle(action).display !== 'none');
+        log('GET FOUNDING ACCESS href is https://ver-de.com/#offer', action.href === 'https://ver-de.com/#offer');
+
+        // Test 6: Final check on viewMode
+        if (viewMode === 'bagsak') {
+          win.eval('openFilmPlayer(catalog.find(f => f.id === "bagsak"))');
+        } else if (viewMode === 'founding') {
+          win.eval('openFilmPlayer(catalog.find(f => f.access === "founding"))');
+        }
+      } catch (err) {
+        log('Exception running test suite: ' + err.message, false);
+      }
+    };
+  </script>
+</body>
+</html>

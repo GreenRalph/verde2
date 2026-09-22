@@ -1,1 +1,148 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="VER-DÉ — AI cinema discovery for the existing VER-DÉ catalog."><title>VER-DÉ — The AI Cinema Engine</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css"></head><body><header><div class="wrap topbar"><a class="mark" href="#top">VER<span>-</span>DÉ</a><span>AI CINEMA ENGINE · PROTOTYPE</span></div></header><main class="wrap" id="top"><section class="hero"><p class="eyebrow">A NEW LAYER INSIDE VER-DÉ</p><h1>FIND THE FILM<br>THAT MEETS <em>YOU</em> HERE.</h1><p>Tell VER-DÉ what the moment calls for. Discovery searches the current catalog without changing how films are watched or accessed.</p></section><section class="conversation" aria-label="Ask VER-DÉ"><div class="conversation-head"><span>ASK VER-DÉ</span><span>17 CATALOGUED WORKS</span></div><div class="messages" id="messages" aria-live="polite"><article class="message assistant-message"><div class="avatar">V</div><div><p class="speaker">VER-DÉ</p><p>What are you looking for right now?</p></div></article></div><form class="prompt-form" id="promptForm"><label class="sr-only" for="prompt">Describe what you want to watch</label><input id="prompt" autocomplete="off" placeholder="I only have 10 minutes. I want something emotional but hopeful." required><button type="submit">Ask</button></form><div class="prompt-suggestions"><span>TRY</span><button type="button" data-prompt="I only have 10 minutes. I want something emotional but hopeful.">emotional, hopeful, 10 minutes</button><button type="button" data-prompt="Show me a film about the land.">about the land</button><button type="button" data-prompt="I want a short film about being judged.">being judged</button></div></section><section class="catalog-head"><span>DISCOVERY RESULTS</span><span id="resultCount">ASK VER-DÉ TO BEGIN</span></section><section class="recommendations" id="recommendations" aria-live="polite"><p class="empty-state">The existing VER-DÉ catalog is ready when you are.</p></section></main><footer><div class="wrap"><div class="mark">VER<span>-</span>DÉ</div><p>A VER-DÉ Film · Music by Green Ralph<br>Directed by Ralph Anthony Sales · Nabua, Camarines Sur</p></div></footer><dialog id="watchDialog"><button class="close-dialog" aria-label="Close">×</button><p class="eyebrow">VER-DÉ</p><h2 id="dialogTitle"></h2><p id="dialogText"></p><iframe id="dialogPlayer" title="VER-DÉ film player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><a class="dialog-action" id="dialogAction" href="https://ver-de.com/#offer" hidden>Get Founding Access →</a></dialog><script src="catalog.js"></script><script src="ai-client.js"></script><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VER-DÉ 2.0 — The AI Cinema Engine. Talk to cinema. Find the film you're looking for — even when you don't know what you're looking for.">
+  <title>VER-DÉ 2.0 — The AI Cinema Engine</title>
+  <link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23080A08'/%3E%3Cpath d='M16 18 L32 46 L48 18' fill='none' stroke='%23E9E7DE' stroke-width='7' stroke-linecap='square'/%3E%3Crect x='26' y='30' width='12' height='4.5' fill='%234E8C63'/%3E%3C/svg%3E" rel="icon">
+  <link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23080A08'/%3E%3Cpath d='M16 18 L32 46 L48 18' fill='none' stroke='%23E9E7DE' stroke-width='7' stroke-linecap='square'/%3E%3Crect x='26' y='30' width='12' height='4.5' fill='%234E8C63'/%3E%3C/svg%3E" rel="apple-touch-icon">
+  <meta name="theme-color" content="#080A08">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <a class="mark" href="#top">VER<span>-</span>DÉ</a>
+      <span>AI CINEMA ENGINE · PROTOTYPE</span>
+    </div>
+  </header>
+
+  <main class="wrap" id="top">
+    <section class="hero">
+      <p class="eyebrow">VER-DÉ 2.0 — THE AI CINEMA ENGINE</p>
+      <h1>Talk to cinema. Find the film you're looking for — <span class="accent-text">even when you don't know what you're looking for.</span></h1>
+      <p class="lede">CAN'T DECIDE WHAT TO WATCH? TELL VER-DÉ WHAT YOU'RE FEELING. I'LL FIND IT.</p>
+    </section>
+
+    <div class="ai-launcher-wrap" id="aiLauncherWrap">
+      <button type="button" class="ai-launcher" id="aiLauncher" aria-expanded="false" aria-controls="conversationSection">
+        <span class="sparkle-gemini" aria-hidden="true">✦</span>
+        <span class="launcher-label">ASK VER-DÉ ANYTHING…</span>
+        <span class="gemini-subtle-badge">Powered by Gemini</span>
+        <span class="launcher-tag">17 CATALOGUED WORKS</span>
+      </button>
+    </div>
+
+    <section class="conversation is-collapsed" id="conversationSection" aria-label="Ask VER-DÉ Anything">
+      <div class="conversation-head">
+        <div class="head-left">
+          <span class="sparkle-gemini" aria-hidden="true">✦</span>
+          <span>ASK VER-DÉ ANYTHING…</span>
+          <span class="gemini-subtle-tag">Powered by Gemini</span>
+        </div>
+        <div class="head-right">
+          <span>17 CATALOGUED WORKS</span>
+          <button type="button" class="collapse-btn" id="collapseAi" aria-label="Collapse Ask VER-DÉ">✕</button>
+        </div>
+      </div>
+
+      <div class="messages" id="messages" aria-live="polite">
+        <article class="message assistant-message">
+          <div class="avatar">V</div>
+          <div class="message-body">
+            <p class="speaker">VER-DÉ</p>
+            <p class="assistant-lead-text">I’ll help you find something. What does the moment call for?</p>
+          </div>
+          <button type="button" class="listen-btn" aria-label="Listen to response" title="Listen">🔊</button>
+        </article>
+      </div>
+
+      <form class="prompt-form" id="promptForm">
+        <input id="prompt" autocomplete="off" placeholder="Tell VER-DÉ what you're looking for…" aria-label="Tell VER-DÉ what you're looking for…" required>
+        <button type="button" class="mic-btn" id="micBtn" aria-label="Voice input" title="Talk to VER-DÉ">
+          <svg class="mic-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+          </svg>
+        </button>
+        <button type="submit">Ask</button>
+      </form>
+
+      <div class="prompt-suggestions">
+        <span>TRY</span>
+        <button type="button" data-prompt="I don't know what to watch, help me.">I don't know what to watch, help me.</button>
+        <button type="button" data-prompt="Emotional, hopeful, 10 minutes">Emotional, hopeful, 10 minutes</button>
+        <button type="button" data-prompt="About the land">About the land</button>
+        <button type="button" data-prompt="Being judged">Being judged</button>
+      </div>
+    </section>
+
+    <!-- Hidden compatibility containers for external queries -->
+    <div id="catalogHead" style="display: none;"><span id="resultCount"></span></div>
+    <div id="recommendations" style="display: none;"></div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="mark">VER<span>-</span>DÉ</div>
+      <p>A VER-DÉ Film · Music by Green Ralph<br>Directed by Ralph Anthony Sales · Nabua, Camarines Sur</p>
+    </div>
+  </footer>
+
+  <dialog id="watchDialog">
+    <button class="close-dialog" aria-label="Close">×</button>
+    <p class="eyebrow">VER-DÉ</p>
+    <h2 id="dialogTitle"></h2>
+    <p id="dialogText"></p>
+    <iframe id="dialogPlayer" title="VER-DÉ film player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    <a class="dialog-action" id="dialogAction" href="https://ver-de.com/#offer" hidden>GET FOUNDING ACCESS →</a>
+
+    <div class="film-companion is-collapsed" id="filmCompanion">
+      <button type="button" class="companion-launcher" id="companionLauncher" aria-expanded="false" aria-controls="companionBody">
+        <div class="launcher-left">
+          <span class="sparkle-gemini" aria-hidden="true">✦</span>
+          <span>ASK VER-DÉ ABOUT THIS FILM</span>
+        </div>
+        <span class="companion-launcher-badge" id="companionLauncherBadge"></span>
+      </button>
+
+      <div class="companion-body" id="companionBody">
+        <div class="companion-head">
+          <div class="head-left">
+            <span class="sparkle-gemini" aria-hidden="true">✦</span>
+            <span>ASK VER-DÉ ABOUT THIS FILM</span>
+            <span class="gemini-subtle-tag">Powered by Gemini</span>
+          </div>
+          <div class="head-right">
+            <span id="companionFilmBadge"></span>
+            <button type="button" class="collapse-btn" id="collapseCompanion" aria-label="Collapse film companion">✕</button>
+          </div>
+        </div>
+
+        <div class="companion-messages" id="companionMessages" aria-live="polite"></div>
+
+        <form class="companion-form" id="companionForm">
+          <input id="companionInput" autocomplete="off" placeholder="Ask about this film..." aria-label="Ask about this film" required>
+          <button type="button" class="mic-btn" id="companionMicBtn" aria-label="Voice input" title="Talk about this film">
+            <svg class="mic-icon" viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+              <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+          </button>
+          <button type="submit">Ask</button>
+        </form>
+
+        <div class="companion-suggestions" id="companionSuggestions"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="catalog.js"></script>
+  <script src="ai-client.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
