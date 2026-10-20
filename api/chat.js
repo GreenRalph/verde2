@@ -12,7 +12,6 @@
 'use strict';
 
 const geminiProvider = require('./providers/gemini.js');
-const nebiusProvider = require('./providers/nebius.js');
 
 module.exports = async function handler(req, res) {
   // Only POST is accepted.
@@ -34,7 +33,7 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'userMessage must be a non-empty string' });
   }
 
-  const provider = (process.env.AI_PROVIDER || 'gemini').trim().toLowerCase();
+  const provider = 'gemini';
 
   try {
     // Action 1: Intent understanding & conversation state interpretation
@@ -54,22 +53,9 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: 'films must be a non-empty array' });
     }
 
-    let result;
-    if (provider === 'nebius') {
-      const apiKey = process.env.NEBIUS_API_KEY;
-      if (!apiKey) throw new Error('NEBIUS_API_KEY is not set in environment variables');
-      result = await nebiusProvider(
-        films,
-        userMessage,
-        context || {},
-        apiKey,
-        process.env.NEBIUS_MODEL
-      );
-    } else {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) throw new Error('GEMINI_API_KEY is not set in environment variables');
-      result = await geminiProvider.enrich(films, userMessage, context || {}, apiKey);
-    }
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) throw new Error('GEMINI_API_KEY is not set in environment variables');
+    const result = await geminiProvider.enrich(films, userMessage, context || {}, apiKey);
 
     // Validate provider output shape before returning it to the browser.
     if (typeof result.chatMessage !== 'string' || !Array.isArray(result.reasons)) {

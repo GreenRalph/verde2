@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="description" content="VER-DÉ 2.0 for Fire TV — tell VER-DÉ what the moment calls for, and it finds the independent film.">
+  <meta name="theme-color" content="#080A08">
+  <title>VER-DÉ for TV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="tv.css">
+</head>
+<body>
+  <div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="mark">VER<span>-</span>DÉ</div>
+    <div class="topbar-right">
+      <span id="householdBadge" class="household-badge" hidden></span>
+      <span class="topbar-tag">INDEPENDENT CINEMA · NABUA, CAMARINES SUR</span>
+    </div>
+  </header>
+
+  <!-- 1. WHO'S WATCHING -->
+  <section class="screen is-active" id="screenWho" aria-label="Who's watching">
+    <p class="eyebrow">VER-DÉ · AI CINEMA</p>
+    <h1 class="display">Who's watching tonight?</h1>
+    <p class="lede">VER-DÉ remembers what each of you chose, so the next night starts closer.</p>
+    <div class="who-row">
+      <button class="who f" data-household="solo">
+        <span class="who-glyph" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="16" r="8"/><path d="M8 42c2-9 8-14 16-14s14 5 16 14"/></svg>
+        </span>
+        <span class="who-title">Just me</span>
+        <span class="who-memory" data-memory-for="solo"></span>
+      </button>
+      <button class="who f" data-household="family">
+        <span class="who-glyph" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="14" cy="16" r="6"/><circle cx="34" cy="16" r="6"/><circle cx="24" cy="26" r="4.5"/><path d="M2 42c1.5-7 6-11 12-11M46 42c-1.5-7-6-11-12-11M15 44c1-6 4.5-9 9-9s8 3 9 9"/></svg>
+        </span>
+        <span class="who-title">With family</span>
+        <span class="who-memory" data-memory-for="family"></span>
+      </button>
+      <button class="who f" data-household="together">
+        <span class="who-glyph" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="17" cy="16" r="7"/><circle cx="31" cy="16" r="7"/><path d="M3 42c2-8 7-12 14-12 3 0 5.5.7 7.5 2M45 42c-2-8-7-12-14-12-3 0-5.5.7-7.5 2"/></svg>
+        </span>
+        <span class="who-title">With someone</span>
+        <span class="who-memory" data-memory-for="together"></span>
+      </button>
+    </div>
+    <p class="hint"><kbd>◀ ▶</kbd> choose · <kbd>OK</kbd> select</p>
+  </section>
+
+  <!-- 2. THE MOMENT -->
+  <section class="screen" id="screenMoment" aria-label="What does the moment call for">
+    <div class="assistant">
+      <span class="avatar" aria-hidden="true">V</span>
+      <div>
+        <p class="speaker">VER-DÉ</p>
+        <p class="assistant-line" id="momentLine">I'll help you find something. What does the moment call for?</p>
+      </div>
+    </div>
+
+    <div class="chip-grid" id="moodChips" role="list">
+      <button class="chip f" data-query="I don't know what to watch, help me.">I don't know what to watch</button>
+      <button class="chip f" data-query="Something emotional, but hopeful.">Something hopeful</button>
+      <button class="chip f" data-query="A film about the land.">About the land</button>
+      <button class="chip f" data-query="Something about being judged.">Being judged</button>
+      <button class="chip f" data-query="A story about family.">About family</button>
+      <button class="chip f" data-query="Something about losing everything and rebuilding.">Losing everything, rebuilding</button>
+      <button class="chip f" data-query="A film about a storm and faith.">The storm and faith</button>
+      <button class="chip f" data-query="Something under 10 minutes.">Under 10 minutes</button>
+      <button class="chip chip-accent f" data-query="Surprise me.">Surprise me</button>
+    </div>
+
+    <div class="memory-rail" id="memoryRail" hidden>
+      <p class="rail-title" id="memoryTitle">Last time</p>
+      <div class="rail" id="memoryCards"></div>
+    </div>
+
+    <p class="hint"><kbd>◀ ▲ ▼ ▶</kbd> move · <kbd>OK</kbd> ask VER-DÉ · <kbd>BACK</kbd> change who's watching</p>
+  </section>
+
+  <!-- 3. LISTENING / RESULTS -->
+  <section class="screen" id="screenResults" aria-label="Recommendations">
+    <div class="ask-echo">
+      <p class="echo-label" id="echoLabel">YOU ASKED</p>
+      <p class="echo-text" id="echoText"></p>
+      <div class="understood" id="understood" hidden></div>
+    </div>
+
+    <div class="assistant assistant-compact">
+      <span class="avatar" aria-hidden="true">V</span>
+      <div>
+        <p class="speaker">VER-DÉ</p>
+        <p class="assistant-line" id="resultLine" aria-live="polite">Listening to the moment…</p>
+      </div>
+    </div>
+
+    <div class="cards" id="cards"></div>
+
+    <div class="refine" id="refine" hidden>
+      <span class="refine-label">REFINE</span>
+      <button class="chip chip-small f" data-refine="another">Another one</button>
+      <button class="chip chip-small f" data-refine="shorter">Something shorter</button>
+      <button class="chip chip-small f" data-refine="why">Why this one?</button>
+      <button class="chip chip-small f" data-refine="mood">Change the mood</button>
+    </div>
+    <p class="hint"><kbd>OK</kbd> watch · <kbd>▼</kbd> refine · <kbd>BACK</kbd> change the mood</p>
+  </section>
+
+  <!-- 4. PLAYER / ACCESS -->
+  <section class="overlay" id="player" aria-label="Now playing" hidden>
+    <div class="player-stage" id="playerStage">
+      <iframe id="playerFrame" title="VER-DÉ film player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
+    <div class="player-chrome" id="playerChrome">
+      <p class="eyebrow">NOW PLAYING · A VER-DÉ FILM</p>
+      <p class="player-title" id="playerTitle"></p>
+      <p class="hint"><kbd>BACK</kbd> return to VER-DÉ</p>
+    </div>
+  </section>
+
+  <section class="overlay overlay-access" id="access" aria-label="Founding Access" hidden>
+    <div class="access-art" id="accessArt"></div>
+    <div class="access-body">
+      <p class="eyebrow">FOUNDING ACCESS</p>
+      <h2 class="display access-title" id="accessTitle"></h2>
+      <p class="access-synopsis" id="accessSynopsis"></p>
+      <p class="access-offer">This film is part of Founding Access. One payment. Lifetime access. No subscription.</p>
+      <div class="access-qr">
+        <div class="qr" id="accessQr" aria-label="QR code to ver-de.com"></div>
+        <div>
+          <p class="qr-lead">Scan with your phone to unlock</p>
+          <p class="qr-url">ver-de.com</p>
+        </div>
+      </div>
+      <div class="access-actions">
+        <button class="chip f" id="accessBack">Back to recommendations</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="vendor/qrcode.js"></script>
+  <script src="catalog.js"></script>
+  <script src="ai-client.js"></script>
+  <script src="tv.js"></script>
+</body>
+</html>

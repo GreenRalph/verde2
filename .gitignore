@@ -1,0 +1,14 @@
+node_modules/
+.env*
+.vercel/
+
+# Kept on the author's machine, not part of this repository
+backup-xprize/
+api/providers/nebius.js
+
+# Android build output
+firetv/.gradle/
+firetv/build/
+firetv/app/build/
+firetv/local.properties
+*.apk

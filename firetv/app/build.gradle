@@ -1,0 +1,28 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.verde.firetv'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.verde.firetv'
+        // Fire OS 5 (API 22) and newer covers every Fire TV Stick still in use.
+        minSdk 22
+        targetSdk 34
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

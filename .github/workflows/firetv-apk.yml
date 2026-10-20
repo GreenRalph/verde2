@@ -1,0 +1,48 @@
+name: Build Fire TV app
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'firetv/**'
+      - '.github/workflows/firetv-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Build debug APK
+        run: gradle -p firetv assembleDebug --no-daemon --stacktrace
+
+      - name: Name the APK
+        run: cp firetv/app/build/outputs/apk/debug/app-debug.apk verde-firetv.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verde-firetv-apk
+          path: verde-firetv.apk
+
+      - name: Publish to the "firetv-latest" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete firetv-latest --yes --cleanup-tag || true
+          gh release create firetv-latest verde-firetv.apk \
+            --target "${{ github.sha }}" \
+            --title "VER-DÉ for Fire TV — latest build" \
+            --notes "Sideload onto a Fire TV device (see README → Install on Fire TV). Built from ${{ github.sha }}."

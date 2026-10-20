@@ -77,7 +77,8 @@ CRITICAL FACTUAL GROUNDING & CONVERSATIONAL RULES:
 • Ground all film facts strictly in currentFilm from conversationState (title, subject, synopsis, themes, runtime, language, format, access, award, filmmaker, location).
 • Never invent film facts (do not invent unconfirmed runtimes, awards, or details). If a specific fact is not available in the catalog, state: "I don't have that detail in the film information I have." and do NOT fall back to a new recommendation.
 • For reactions ("awesome", "that's depressing", "haha", "I don't like sad movies"), acknowledge naturally in context. DO NOT say "I can't make a confident recommendation" or trigger discovery.
-• If intent is not "conversation" or "explain_current", set chatMessage to "".`;
+• If intent is not "conversation" or "explain_current", set chatMessage to "".
+• conversationState.household may say who is watching (e.g. "watching with family"). It describes the audience, not the film's theme: do not add "family" to concepts because of it. You may let it shape the tone of chatMessage.`;
 
 // Schema for enriching already-selected films
 const ENRICH_RESPONSE_SCHEMA = {
@@ -109,7 +110,8 @@ STRICT RULES — follow every one exactly:
    • Multiple films: "These are the closest published matches for what you described."
 3. For each film write a reason — 1 to 2 sentences. Use ONLY these fields: title, subject, synopsis, themes, runtime, language, format, access, award. Do NOT invent any fact not present in those fields.
 4. Every filmId in the reasons array must exactly match the id value you receive. No substitutions.
-5. Return only the JSON object. No markdown. No explanation. No extra keys.`;
+5. Return only the JSON object. No markdown. No explanation. No extra keys.
+6. context.household may say who is watching (e.g. "watching with family"). When present, you may end one reason with a short clause on why it suits that audience, still using only the fields above.`;
 
 async function callGemini(systemPrompt, userPayload, schema, apiKey) {
   const body = {
