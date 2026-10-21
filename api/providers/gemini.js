@@ -120,8 +120,8 @@ async function callGemini(systemPrompt, userPayload, schema, apiKey) {
     generationConfig: {
       responseMimeType: 'application/json',
       responseSchema: schema,
-      thinking_level: 'low',
-      maxOutputTokens: 512
+      thinkingConfig: { thinkingLevel: 'low' },
+      maxOutputTokens: 1024
     }
   };
 
