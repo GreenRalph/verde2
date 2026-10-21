@@ -113,7 +113,7 @@ STRICT RULES — follow every one exactly:
 5. Return only the JSON object. No markdown. No explanation. No extra keys.
 6. context.household may say who is watching (e.g. "watching with family"). When present, you may end one reason with a short clause on why it suits that audience, still using only the fields above.`;
 
-const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-flash-latest'];
+const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest'];
 
 async function callGemini(systemPrompt, userPayload, schema, apiKey) {
   let lastError;
