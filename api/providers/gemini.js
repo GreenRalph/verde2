@@ -113,34 +113,51 @@ STRICT RULES — follow every one exactly:
 5. Return only the JSON object. No markdown. No explanation. No extra keys.
 6. context.household may say who is watching (e.g. "watching with family"). When present, you may end one reason with a short clause on why it suits that audience, still using only the fields above.`;
 
+const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-flash-latest'];
+
 async function callGemini(systemPrompt, userPayload, schema, apiKey) {
-  const body = {
-    system_instruction: { parts: [{ text: systemPrompt }] },
-    contents: [{ parts: [{ text: JSON.stringify(userPayload) }] }],
-    generationConfig: {
-      responseMimeType: 'application/json',
-      responseSchema: schema,
-      thinkingConfig: { thinkingLevel: 'low' },
-      maxOutputTokens: 1024
+  let lastError;
+  for (const model of GEMINI_MODELS) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const generationConfig = {
+        responseMimeType: 'application/json',
+        responseSchema: schema,
+        maxOutputTokens: 1024
+      };
+      if (model === GEMINI_MODELS[0]) generationConfig.thinkingConfig = { thinkingLevel: 'low' };
+
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: systemPrompt }] },
+            contents: [{ parts: [{ text: JSON.stringify(userPayload) }] }],
+            generationConfig
+          })
+        }
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) return JSON.parse(text);
+        lastError = new Error(`Gemini (${model}) returned empty content`);
+        break;
+      }
+
+      const errText = await res.text().catch(() => res.statusText);
+      lastError = new Error(`Gemini ${model} ${res.status}: ${errText}`);
+      // Busy or rate-limited: wait briefly and retry, then try the backup model.
+      if (res.status === 503 || res.status === 429) {
+        await new Promise(r => setTimeout(r, 800));
+        continue;
+      }
+      break;
     }
-  };
-
-  const res = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-
-  if (!res.ok) {
-    const errText = await res.text().catch(() => res.statusText);
-    throw new Error(`Gemini ${res.status}: ${errText}`);
   }
-
-  const data = await res.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error('Gemini returned empty content');
-
-  return JSON.parse(text);
+  throw lastError;
 }
 
 async function geminiUnderstand(userMessage, conversationState, apiKey) {
